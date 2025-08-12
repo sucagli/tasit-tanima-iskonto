@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Taşıt Tanıma İskonto Hesaplama</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 min-h-screen py-8">
+    <div class="max-w-4xl mx-auto px-4">
+        <h1 class="text-3xl font-bold text-center mb-8 text-red-600">Taşıt Tanıma İskonto Hesaplama</h1>
+        <!-- Marka Seçimi -->
+        <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+            <h2 class="text-xl font-semibold mb-4">Marka Seçimi</h2>
+            <div class="grid grid-cols-2 gap-4">
+                <button onclick="markaSecimi('shell')" id="shellBtn" class="p-4 border-2 border-gray-300 rounded-lg hover:border-yellow-500 transition-colors bg-yellow-400 text-red-600">
+                    <div class="font-bold text-lg">Shell</div>
+                    <div class="text-sm">İskonto: %9.25</div>
+                </button>
+                <button onclick="markaSecimi('total')" id="totalBtn" class="p-4 border-2 border-gray-300 rounded-lg hover:border-red-500 transition-colors bg-red-600 text-white">
+                    <div class="font-bold text-lg">Total</div>
+                    <div class="text-sm">Genel: %7.50, DOCO İstasyonları: +%2.00</div>
+                </button>
+            </div>
+            <div class="mt-4">
+                <label class="flex items-center">
+                    <input type="checkbox" id="totalKendiIstasyon" disabled class="mr-2">
+                    <span class="text-sm">Total'in DOCO istasyonlarından alım yapılıyor</span>
+                </label>
+            </div>
+        </div>
+        <!-- Ödeme Şekli -->
+        <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+            <h2 class="text-xl font-semibold mb-4">Ödeme Şekli</h2>
+            <div class="grid grid-cols-3 gap-4 mb-4">
+                <button onclick="odemeSecimi('dbs')" id="dbsBtn" class="p-3 border-2 border-gray-300 rounded-lg hover:border-blue-500 transition-colors">DBS</button>
+                <button onclick="odemeSecimi('kredikarti')" id="kkBtn" class="p-3 border-2 border-gray-300 rounded-lg hover:border-blue-500 transition-colors">Kredi Kartı</button>
+                <button onclick="odemeSecimi('onodeme')" id="onodemeBtn" class="p-3 border-2 border-gray-300 rounded-lg hover:border-blue-500 transition-colors">Ön Ödeme</button>
+            </div>
+            <!-- Kredi Kartı Seçenekleri -->
+            <div id="kkSecenekleri" class="hidden mb-4">
+                <h3 class="font-semibold mb-2">Kredi Kartı Tipi</h3>
+                <div class="grid grid-cols-2 gap-4">
+                    <button onclick="kkTipiSecimi('normal')" id="kkNormalBtn" class="p-3 border-2 border-gray-300 rounded-lg hover:border-blue-500 transition-colors">Normal Çekim</button>
+                    <button onclick="kkTipiSecimi('toplu')" id="kkTopluBtn" class="p-3 border-2 border-gray-300 rounded-lg hover:border-blue-500 transition-colors">Önden Toplu Çekim</button>
+                </div>
+            </div>
+            <!-- Vade Seçenekleri -->
+            <div id="vadeSecenekleri">
+                <h3 class="font-semibold mb-2">Fatura Ödeme Vadesi</h3>
+                <div class="grid grid-cols-6 gap-2 mb-4">
+                    <button onclick="vadeSecimi('fatura1')" id="f1Btn" class="p-2 text-sm border-2 border-gray-300 rounded hover:border-blue-500 transition-colors">Fatura +1</button>
+                    <button onclick="vadeSecimi('fatura5')" id="f5Btn" class="p-2 text-sm border-2 border-gray-300 rounded hover:border-blue-500 transition-colors">Fatura +5</button>
+                    <button onclick="vadeSecimi('fatura7')" id="f7Btn" class="p-2 text-sm border-2 border-gray-300 rounded hover:border-blue-500 transition-colors font-bold">Fatura +7 (standart)</button>
+                    <button onclick="vadeSecimi('fatura10')" id="f10Btn" class="p-2 text-sm border-2 border-gray-300 rounded hover:border-blue-500 transition-colors">Fatura +10</button>
+                    <button onclick="vadeSecimi('fatura20')" id="f20Btn" class="p-2 text-sm border-2 border-gray-300 rounded hover:border-blue-500 transition-colors">Fatura +20</button>
+                    <button onclick="vadeSecimi('fatura30')" id="f30Btn" class="p-2 text-sm border-2 border-gray-300 rounded hover:border-blue-500 transition-colors">Fatura +30</button>
+                </div>
+                <h3 class="font-semibold mb-2">Toplu Ödeme (3 Fatura Toplamı - Ertesi Ay Ödeme)</h3>
+                <div class="grid grid-cols-5 gap-2">
+                    <button onclick="vadeSecimi('toplu1')" id="t1Btn" class="p-2 text-sm border-2 border-gray-300 rounded hover:border-blue-500 transition-colors">Ertesi Ay 1'i</button>
+                    <button onclick="vadeSecimi('toplu5')" id="t5Btn" class="p-2 text-sm border-2 border-gray-300 rounded hover:border-blue-500 transition-colors">Ertesi Ay 5'i</button>
+                    <button onclick="vadeSecimi('toplu10')" id="t10Btn" class="p-2 text-sm border-2 border-gray-300 rounded hover:border-blue-500 transition-colors">Ertesi Ay 10'u</button>
+                    <button onclick="vadeSecimi('toplu20')" id="t20Btn" class="p-2 text-sm border-2 border-gray-300 rounded hover:border-blue-500 transition-colors">Ertesi Ay 20'si</button>
+                    <button onclick="vadeSecimi('toplu30')" id="t30Btn" class="p-2 text-sm border-2 border-gray-300 rounded hover:border-blue-500 transition-colors">Ertesi Ay 30'u</button>
+                </div>
+            </div>
+            <!-- Ön Ödeme Tutarı -->
+            <div id="onOdemeAlani" class="hidden mt-4">
+                <label class="block mb-2 font-semibold">Ön Ödeme Tutarı (TL)</label>
+                <input type="number" id="onOdemeTutar" class="w-full p-3 border border-gray-300 rounded-lg" placeholder="Ön ödeme tutarını girin">
+                <p class="text-sm text-blue-600 mt-1">Ön ödeme seçildiğinde sabit %2 ek iskonto uygulanır.</p>
+            </div>
+            <!-- Toplu Çekim Tutarı -->
+            <div id="topluCekimAlani" class="hidden mt-4">
+                <label class="block mb-2 font-semibold">Toplu Çekim Tutarı (TL)</label>
+                <input type="number" id="topluCekimTutar" class="w-full p-3 border border-gray-300 rounded-lg" placeholder="Toplu çekim tutarını girin">
+                <p class="text-sm text-blue-600 mt-1">Önden toplu çekim seçildiğinde POS komisyonu %1 olarak uygulanır.</p>
+            </div>
+        </div>
+        <!-- Tüketim Tutarı -->
+        <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+            <label class="block mb-2 font-semibold">Toplam Tüketim Tutarı (TL)</label>
+            <input type="number" id="tuketimTutar" class="w-full p-3 border border-gray-300 rounded-lg" placeholder="Toplam tüketim tutarını girin">
+        </div>
+        <!-- Hesapla Butonu -->
+        <div class="text-center mb-6">
+            <button onclick="hesapla()" class="bg-white hover:bg-gray-100 text-red-600 border-2 border-red-600 font-bold py-3 px-8 rounded-lg transition-colors">
+                İskonto Hesapla
+            </button>
+        </div>
+        <!-- Sonuç -->
+        <div id="sonucAlani" class="hidden bg-white rounded-lg shadow-md p-6">
+            <h2 class="text-xl font-semibold mb-4">Hesaplama Sonucu</h2>
+            <div class="bg-red-50 p-4 rounded-lg mb-4">
+                <h3 class="font-semibold text-red-600 mb-2">Maksimum Verilebilecek İskonto</h3>
+                <div id="maxIskonto" class="text-3xl font-bold text-red-600">%0.00</div>
+            </div>
+            <div class="bg-gray-50 p-4 rounded-lg mb-4">
+                <h3 class="font-semibold mb-3">Hesaplama Detayları</h3>
+                <div class="space-y-2 text-sm">
+                    <div class="flex justify-between">
+                        <span>Marka İskontosu:</span>
+                        <span id="markaIskonto" class="font-medium">%0.00</span>
+                    </div>
+                    <div id="totalIstasyonSatir" class="flex justify-between hidden">
+                        <span>Total DOCO İstasyon Avantajı:</span>
+                        <span id="totalIstasyonAvantaj" class="font-medium">%0.00</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span>Vade Farkı:</span>
+                        <span id="vadeFark" class="font-medium">%0.00</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span>POS Komisyonu:</span>
+                        <span id="posKomisyon" class="font-medium">%0.00</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span>Ters Valör Avantajı:</span>
+                        <span id="tersValor" class="font-medium">%0.00</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span>Ortalama Vade Süresi:</span>
+                        <span id="ortVade" class="font-medium">0 gün</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span>Vade Farkı Günü:</span>
+                        <span id="vadeFarkGun" class="font-medium">0 gün</span>
+                    </div>
+                    <div class="flex justify-between hidden">
+                        <span>Benim Tedarikçiye Ödeme Vadem:</span>
+                        <span id="benimVade" class="font-medium">0 gün</span>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-yellow-50 p-4 rounded-lg">
+                <h3 class="font-semibold mb-2">Açıklama</h3>
+                <div id="aciklama" class="text-sm text-gray-700">
+                    Hesaplama sonuçları burada görüntülenecek.
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- JavaScript ve hesaplama fonksiyonları dahil -->
+    <!-- ... (orijinal kodun <script> kısmı burada olmalı, karakter sınırına takılmamak için yukarıdaki kodun tamamını kendi dosyanızdan kopyalayabilirsiniz) ... -->
+</body>
+</html>
