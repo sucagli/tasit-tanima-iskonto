@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Taşıt Tanıma İskonto Hesaplama</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 min-h-screen py-8">
+    <div class="max-w-4xl mx-auto px-4">
+        <h1 class="text-3xl font-bold text-center mb-8 text-red-600">Taşıt Tanıma İskonto Hesaplama</h1>
+        
+        <!-- Marka Seçimi -->
+        <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+            <h2 class="text-xl font-semibold mb-4">Marka Seçimi</h2>
+            <div class="grid grid-cols-2 gap-4">
+                <button onclick="markaSecimi('shell')" id="shellBtn" class="p-4 border-2 border-gray-300 rounded-lg hover:border-yellow-500 transition-colors bg-yellow-400 text-red-600">
+                    <div class="font-bold text-lg">Shell</div>
+                    <div class="text-sm">İskonto: %9.25</div>
+                </button>
+                <button onclick="markaSecimi('total')" id="totalBtn" class="p-4 border-2 border-gray-300 rounded-lg hover:border-red-500 transition-colors bg-red-600 text-white">
+                    <div class="font-bold text-lg">Total</div>
+                    <div class="text-sm">Genel: %7.50, DOCO İstasyonları: +%2.00</div>
+                </button>
+            </div>
+            <div class="mt-4">
+                <label class="flex items-center">
+                    <input type="checkbox" id="totalKendiIstasyon" disabled class="mr-2">
+                    <span class="text-sm">Total'in DOCO istasyonlarından alım yapılıyor</span>
+                </label>
+            </div>
+        </div>
+
+        <!-- Ödeme Şekli -->
+        <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+            <h2 class="text-xl font-semibold mb-4">Ödeme Şekli</h2>
+            <div class="grid grid-cols-3 gap-4 mb-4">
+                <button onclick="odemeSecimi('dbs')" id="dbsBtn" class="p-3 border-2 border-gray-300 rounded-lg hover:border-blue-500 transition-colors">DBS</button>
+                <button onclick="odemeSecimi('kredikarti')" id="kkBtn" class="p-3 border-2 border-gray-300 rounded-lg hover:border-blue-500 transition-colors">Kredi Kartı</button>
+                <button onclick="odemeSecimi('onodeme')" id="onodemeBtn" class="p-3 border-2 border-gray-300 rounded-lg hover:border-blue-500 transition-colors">Ön Ödeme</button>
+            </div>
+
+            <!-- Kredi Kartı Seçenekleri -->
+            <div id="kkSecenekleri" class="hidden mb-4">
+                <h3 class="font-semibold mb-2">Kredi Kartı Tipi</h3>
+                <div class="grid grid-cols-2 gap-4">
+                    <button onclick="kkTipiSecimi('normal')" id="kkNormalBtn" class="p-3 border-2 border-gray-300 rounded-lg hover:border-blue-500 transition-colors">Normal Çekim</button>
+                    <button onclick="kkTipiSecimi('toplu')" id="kkTopluBtn" class="p-3 border-2 border-gray-300 rounded-lg hover:border-blue-500 transition-colors">Önden Toplu Çekim</button>
+                </div>
+            </div>
+
+            <!-- Vade Seçenekleri -->
+            <div id="vadeSecenekleri">
+                <h3 class="font-semibold mb-2">Fatura Ödeme Vadesi</h3>
+                <div class="grid grid-cols-6 gap-2 mb-4">
+                    <button onclick="vadeSecimi('fatura1')" id="f1Btn" class="p-2 text-sm border-2 border-gray-300 rounded hover:border-blue-500 transition-colors">Fatura +1</button>
+                    <button onclick="vadeSecimi('fatura5')" id="f5Btn" class="p-2 text-sm border-2 border-gray-300 rounded hover:border-blue-500 transition-colors">Fatura +5</button>
+                    <button onclick="vadeSecimi('fatura7')" id="f7Btn" class="p-2 text-sm border-2 border-gray-300 rounded hover:border-blue-500 transition-colors font-bold">Fatura +7 (standart)</button>
+                    <button onclick="vadeSecimi('fatura10')" id="f10Btn" class="p-2 text-sm border-2 border-gray-300 rounded hover:border-blue-500 transition-colors">Fatura +10</button>
+                    <button onclick="vadeSecimi('fatura20')" id="f20Btn" class="p-2 text-sm border-2 border-gray-300 rounded hover:border-blue-500 transition-colors">Fatura +20</button>
+                    <button onclick="vadeSecimi('fatura30')" id="f30Btn" class="p-2 text-sm border-2 border-gray-300 rounded hover:border-blue-500 transition-colors">Fatura +30</button>
+                </div>
+                
+                <h3 class="font-semibold mb-2">Toplu Ödeme (3 Fatura Toplamı - Ertesi Ay Ödeme)</h3>
+                <div class="grid grid-cols-5 gap-2">
+                    <button onclick="vadeSecimi('toplu1')" id="t1Btn" class="p-2 text-sm border-2 border-gray-300 rounded hover:border-blue-500 transition-colors">Ertesi Ay 1'i</button>
+                    <button onclick="vadeSecimi('toplu5')" id="t5Btn" class="p-2 text-sm border-2 border-gray-300 rounded hover:border-blue-500 transition-colors">Ertesi Ay 5'i</button>
+                    <button onclick="vadeSecimi('toplu10')" id="t10Btn" class="p-2 text-sm border-2 border-gray-300 rounded hover:border-blue-500 transition-colors">Ertesi Ay 10'u</button>
+                    <button onclick="vadeSecimi('toplu20')" id="t20Btn" class="p-2 text-sm border-2 border-gray-300 rounded hover:border-blue-500 transition-colors">Ertesi Ay 20'si</button>
+                    <button onclick="vadeSecimi('toplu30')" id="t30Btn" class="p-2 text-sm border-2 border-gray-300 rounded hover:border-blue-500 transition-colors">Ertesi Ay 30'u</button>
+                </div>
+            </div>
+
+            <!-- Ön Ödeme Tutarı -->
+            <div id="onOdemeAlani" class="hidden mt-4">
+                <label class="block mb-2 font-semibold">Ön Ödeme Tutarı (TL)</label>
+                <input type="number" id="onOdemeTutar" class="w-full p-3 border border-gray-300 rounded-lg" placeholder="Ön ödeme tutarını girin">
+                <p class="text-sm text-blue-600 mt-1">Ön ödeme seçildiğinde sabit %2 ek iskonto uygulanır.</p>
+            </div>
+
+            <!-- Toplu Çekim Tutarı -->
+            <div id="topluCekimAlani" class="hidden mt-4">
+                <label class="block mb-2 font-semibold">Toplu Çekim Tutarı (TL)</label>
+                <input type="number" id="topluCekimTutar" class="w-full p-3 border border-gray-300 rounded-lg" placeholder="Toplu çekim tutarını girin">
+                <p class="text-sm text-blue-600 mt-1">Önden toplu çekim seçildiğinde POS komisyonu %1 olarak uygulanır.</p>
+            </div>
+        </div>
+
+        <!-- Tüketim Tutarı -->
+        <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+            <label class="block mb-2 font-semibold">Toplam Tüketim Tutarı (TL)</label>
+            <input type="number" id="tuketimTutar" class="w-full p-3 border border-gray-300 rounded-lg" placeholder="Toplam tüketim tutarını girin">
+        </div>
+
+        <!-- Hesapla Butonu -->
+        <div class="text-center mb-6">
+            <button onclick="hesapla()" class="bg-white hover:bg-gray-100 text-red-600 border-2 border-red-600 font-bold py-3 px-8 rounded-lg transition-colors">
+                İskonto Hesapla
+            </button>
+        </div>
+
+        <!-- Sonuç -->
+        <div id="sonucAlani" class="hidden bg-white rounded-lg shadow-md p-6">
+            <h2 class="text-xl font-semibold mb-4">Hesaplama Sonucu</h2>
+            
+            <div class="bg-red-50 p-4 rounded-lg mb-4">
+                <h3 class="font-semibold text-red-600 mb-2">Maksimum Verilebilecek İskonto</h3>
+                <div id="maxIskonto" class="text-3xl font-bold text-red-600">%0.00</div>
+            </div>
+            
+            <div class="bg-gray-50 p-4 rounded-lg mb-4">
+                <h3 class="font-semibold mb-3">Hesaplama Detayları</h3>
+                <div class="space-y-2 text-sm">
+                    <div class="flex justify-between">
+                        <span>Marka İskontosu:</span>
+                        <span id="markaIskonto" class="font-medium">%0.00</span>
+                    </div>
+                    <div id="totalIstasyonSatir" class="flex justify-between hidden">
+                        <span>Total DOCO İstasyon Avantajı:</span>
+                        <span id="totalIstasyonAvantaj" class="font-medium">%0.00</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span>Vade Farkı:</span>
+                        <span id="vadeFark" class="font-medium">%0.00</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span>POS Komisyonu:</span>
+                        <span id="posKomisyon" class="font-medium">%0.00</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span>Ters Valör Avantajı:</span>
+                        <span id="tersValor" class="font-medium">%0.00</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span>Ortalama Vade Süresi:</span>
+                        <span id="ortVade" class="font-medium">0 gün</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span>Vade Farkı Günü:</span>
+                        <span id="vadeFarkGun" class="font-medium">0 gün</span>
+                    </div>
+                    <div class="flex justify-between hidden">
+                        <span>Benim Tedarikçiye Ödeme Vadem:</span>
+                        <span id="benimVade" class="font-medium">0 gün</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bg-yellow-50 p-4 rounded-lg">
+                <h3 class="font-semibold mb-2">Açıklama</h3>
+                <div id="aciklama" class="text-sm text-gray-700">
+                    Hesaplama sonuçları burada görüntülenecek.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global değişkenler
+        let seciliMarka = null;
+        let seciliOdeme = null;
+        let seciliVade = null;
+        let seciliKKTipi = null;
+
+        // Sabitler
+        const SHELL_ISKONTO = 9.25;
+        const TOTAL_ISKONTO = 7.50;
+        const TOTAL_ISTASYON_BONUS = 2.00;
+        const ON_ODEME_BONUS = 2.00;
+        const POS_NORMAL = 2.90;
+        const POS_TOPLU = 1.00;
+        const STANDART_VADE = 7; // Fatura +7 gün standart
+        const GUNLUK_VADE_MALIYET = 0.14; // Her gün için %0.14
+        const GUNLUK_ON_ODEME = 50 / 365;
+
+        function markaSecimi(marka) {
+            seciliMarka = marka;
+            
+            // Buton stillerini güncelle
+            document.getElementById('shellBtn').className = 'p-4 border-2 border-gray-300 rounded-lg hover:border-yellow-500 transition-colors bg-yellow-400 text-red-600';
+            document.getElementById('totalBtn').className = 'p-4 border-2 border-gray-300 rounded-lg hover:border-red-500 transition-colors bg-red-600 text-white';
+            
+            if (marka === 'shell') {
+                document.getElementById('shellBtn').className = 'p-4 border-2 border-yellow-500 bg-yellow-500 text-red-700 rounded-lg';
+                document.getElementById('totalKendiIstasyon').disabled = true;
+                document.getElementById('totalKendiIstasyon').checked = false;
+            } else {
+                document.getElementById('totalBtn').className = 'p-4 border-2 border-red-500 bg-red-700 text-white rounded-lg';
+                document.getElementById('totalKendiIstasyon').disabled = false;
+            }
+        }
+
+        function odemeSecimi(odeme) {
+            seciliOdeme = odeme;
+            
+            // Buton stillerini güncelle
+            document.getElementById('dbsBtn').className = 'p-3 border-2 border-gray-300 rounded-lg hover:border-blue-500 transition-colors';
+            document.getElementById('kkBtn').className = 'p-3 border-2 border-gray-300 rounded-lg hover:border-blue-500 transition-colors';
+            document.getElementById('onodemeBtn').className = 'p-3 border-2 border-gray-300 rounded-lg hover:border-blue-500 transition-colors';
+            
+            document.getElementById(odeme === 'dbs' ? 'dbsBtn' : odeme === 'kredikarti' ? 'kkBtn' : 'onodemeBtn').className = 'p-3 border-2 border-blue-500 bg-blue-50 rounded-lg';
+
+            // Alanları göster/gizle
+            document.getElementById('kkSecenekleri').className = 'hidden mb-4';
+            document.getElementById('vadeSecenekleri').style.display = 'block';
+            document.getElementById('onOdemeAlani').className = 'hidden mt-4';
+            document.getElementById('topluCekimAlani').className = 'hidden mt-4';
+
+            if (odeme === 'kredikarti') {
+                document.getElementById('kkSecenekleri').className = 'mb-4';
+                seciliKKTipi = null;
+                document.getElementById('kkNormalBtn').className = 'p-3 border-2 border-gray-300 rounded-lg hover:border-blue-500 transition-colors';
+                document.getElementById('kkTopluBtn').className = 'p-3 border-2 border-gray-300 rounded-lg hover:border-blue-500 transition-colors';
+            } else if (odeme === 'onodeme') {
+                document.getElementById('vadeSecenekleri').style.display = 'none';
+                document.getElementById('onOdemeAlani').className = 'mt-4';
+                seciliVade = 'fatura1';
+            }
+
+            // Vade seçimini temizle
+            if (odeme !== 'onodeme') {
+                seciliVade = null;
+                vadeButonlariniTemizle();
+            }
+        }
+
+        function kkTipiSecimi(tip) {
+            seciliKKTipi = tip;
+            
+            document.getElementById('kkNormalBtn').className = 'p-3 border-2 border-gray-300 rounded-lg hover:border-blue-500 transition-colors';
+            document.getElementById('kkTopluBtn').className = 'p-3 border-2 border-gray-300 rounded-lg hover:border-blue-500 transition-colors';
+            
+            document.getElementById(tip === 'normal' ? 'kkNormalBtn' : 'kkTopluBtn').className = 'p-3 border-2 border-blue-500 bg-blue-50 rounded-lg';
+
+            if (tip === 'toplu') {
+                document.getElementById('vadeSecenekleri').style.display = 'none';
+                document.getElementById('topluCekimAlani').className = 'mt-4';
+                seciliVade = 'fatura1';
+            } else {
+                document.getElementById('vadeSecenekleri').style.display = 'block';
+                document.getElementById('topluCekimAlani').className = 'hidden mt-4';
+                seciliVade = null;
+                vadeButonlariniTemizle();
+            }
+        }
+
+        function vadeSecimi(vade) {
+            seciliVade = vade;
+            vadeButonlariniTemizle();
+            
+            const butonId = vade.replace('fatura', 'f').replace('toplu', 't') + 'Btn';
+            document.getElementById(butonId).className = 'p-2 text-sm border-2 border-blue-500 bg-blue-50 rounded';
+        }
+
+        function vadeButonlariniTemizle() {
+            const vadeButonlari = ['f1Btn', 'f5Btn', 'f7Btn', 'f10Btn', 'f20Btn', 'f30Btn', 't1Btn', 't5Btn', 't10Btn', 't20Btn', 't30Btn'];
+            vadeButonlari.forEach(btn => {
+                if (btn === 'f7Btn') {
+                    document.getElementById(btn).className = 'p-2 text-sm border-2 border-gray-300 rounded hover:border-blue-500 transition-colors font-bold';
+                } else {
+                    document.getElementById(btn).className = 'p-2 text-sm border-2 border-gray-300 rounded hover:border-blue-500 transition-colors';
+                }
+            });
+        }
+
+        function hesapla() {
+            // Kontroller
+            if (!seciliMarka) {
+                alert('Lütfen bir marka seçin.');
+                return;
+            }
+            if (!seciliOdeme) {
+                alert('Lütfen ödeme şekli seçin.');
+                return;
+            }
+            if (seciliOdeme === 'kredikarti' && !seciliKKTipi) {
+                alert('Lütfen kredi kartı tipini seçin.');
+                return;
+            }
+            if (seciliOdeme !== 'onodeme' && !(seciliOdeme === 'kredikarti' && seciliKKTipi === 'toplu') && !seciliVade) {
+                alert('Lütfen vade seçin.');
+                return;
+            }
+
+            const tuketim = parseFloat(document.getElementById('tuketimTutar').value);
+            if (!tuketim || tuketim <= 0) {
+                alert('Lütfen geçerli bir tüketim tutarı girin.');
+                return;
+            }
+
+            let onOdeme = 0;
+            if (seciliOdeme === 'onodeme') {
+                onOdeme = parseFloat(document.getElementById('onOdemeTutar').value);
+                if (!onOdeme || onOdeme <= 0) {
+                    alert('Lütfen geçerli bir ön ödeme tutarı girin.');
+                    return;
+                }
+            }
+
+            let topluCekim = 0;
+            if (seciliOdeme === 'kredikarti' && seciliKKTipi === 'toplu') {
+                topluCekim = parseFloat(document.getElementById('topluCekimTutar').value);
+                if (!topluCekim || topluCekim <= 0) {
+                    alert('Lütfen geçerli bir toplu çekim tutarı girin.');
+                    return;
+                }
+            }
+
+            // Hesaplama
+            const sonuc = iskontoHesapla(tuketim, onOdeme, topluCekim);
+            sonuclariGoster(sonuc);
+        }
+
+        function iskontoHesapla(tuketim, onOdeme, topluCekim) {
+            // Marka iskontosu
+            let markaIskonto = seciliMarka === 'shell' ? SHELL_ISKONTO : TOTAL_ISKONTO;
+            
+            // Total kendi istasyon bonusu
+            let totalBonus = 0;
+            if (seciliMarka === 'total' && document.getElementById('totalKendiIstasyon').checked) {
+                totalBonus = TOTAL_ISTASYON_BONUS;
+            }
+
+            // Vade hesaplama
+            let ortVade = 0;
+            let vadeFarkGun = 0;
+            let benimOdemeVadem = 0;
+            let vadeFark = 0;
+
+            if (seciliOdeme === 'onodeme' || (seciliOdeme === 'kredikarti' && seciliKKTipi === 'toplu')) {
+                ortVade = 0;
+                vadeFarkGun = 0;
+                benimOdemeVadem = 0;
+                vadeFark = 0;
+            } else if (seciliVade) {
+                if (seciliVade.startsWith('fatura')) {
+                    ortVade = parseInt(seciliVade.replace('fatura', ''));
+                    benimOdemeVadem = 0;
+                    vadeFarkGun = Math.max(0, ortVade - STANDART_VADE);
+                    vadeFark = vadeFarkGun * GUNLUK_VADE_MALIYET;
+                } else if (seciliVade.startsWith('toplu')) {
+                    const gun = parseInt(seciliVade.replace('toplu', ''));
+                    
+                    // Toplu ödeme için sabit iskonto oranları
+                    if (seciliMarka === 'shell') {
+                        ortVade = 10 + 30 + gun;
+                        benimOdemeVadem = 10; // Shell alış vadem: fatura +10 gün
+                        
+                        // Shell toplu ödeme iskonto oranları
+                        if (gun === 1) vadeFark = 2.45;
+                        else if (gun === 5) vadeFark = 3.07;
+                        else if (gun === 10) vadeFark = 3.83;
+                        else if (gun === 20) vadeFark = 5.37;
+                        else if (gun === 30) vadeFark = 6.90;
+                        
+                        vadeFarkGun = Math.round(vadeFark / GUNLUK_VADE_MALIYET);
+                        
+                    } else { // Total
+                        ortVade = 10 + 30 + gun;
+                        benimOdemeVadem = 20; // Total alış vadem: ertesi ay 10'u (ortalama 20 gün)
+                        
+                        // Total toplu ödeme iskonto oranları
+                        if (gun === 1) vadeFark = 0;
+                        else if (gun === 5) vadeFark = 0;
+                        else if (gun === 10) vadeFark = 0;
+                        else if (gun === 20) vadeFark = 1.53;
+                        else if (gun === 30) vadeFark = 3.07;
+                        
+                        vadeFarkGun = vadeFark > 0 ? Math.round(vadeFark / GUNLUK_VADE_MALIYET) : 0;
+                    }
+                }
+            }
+
+            // POS komisyonu
+            let posKomisyon = 0;
+            if (seciliOdeme === 'kredikarti') {
+                posKomisyon = seciliKKTipi === 'toplu' ? POS_TOPLU : POS_NORMAL;
+            }
+
+            // Ters valör
+            let tersValor = 0;
+            if (seciliOdeme === 'onodeme') {
+                tersValor = ON_ODEME_BONUS;
+            } else if (seciliOdeme === 'kredikarti' && seciliKKTipi === 'toplu' && topluCekim > 0) {
+                const oran = topluCekim / tuketim;
+                tersValor = oran * (30 * (GUNLUK_ON_ODEME / 100));
+            } else if (seciliVade === 'fatura1') {
+                tersValor = 0.50; // Fatura +1 için ters valör avantajı
+            }
+
+            // Maksimum iskonto
+            const maxIskonto = markaIskonto + totalBonus - vadeFark - posKomisyon + tersValor;
+
+            return {
+                markaIskonto,
+                totalBonus,
+                vadeFark,
+                posKomisyon,
+                tersValor,
+                ortVade,
+                vadeFarkGun,
+                benimOdemeVadem,
+                maxIskonto: Math.max(0, maxIskonto)
+            };
+        }
+
+        function sonuclariGoster(sonuc) {
+            document.getElementById('maxIskonto').textContent = `%${sonuc.maxIskonto.toFixed(2)}`;
+            document.getElementById('markaIskonto').textContent = `%${sonuc.markaIskonto.toFixed(2)}`;
+            document.getElementById('vadeFark').textContent = `%${sonuc.vadeFark.toFixed(2)}`;
+            document.getElementById('posKomisyon').textContent = `%${sonuc.posKomisyon.toFixed(2)}`;
+            document.getElementById('tersValor').textContent = `%${sonuc.tersValor.toFixed(2)}`;
+            document.getElementById('ortVade').textContent = `${sonuc.ortVade.toFixed(0)} gün`;
+            document.getElementById('vadeFarkGun').textContent = `${sonuc.vadeFarkGun.toFixed(0)} gün`;
+            document.getElementById('benimVade').textContent = `${sonuc.benimOdemeVadem.toFixed(0)} gün`;
+
+            // Total istasyon satırını göster/gizle
+            if (sonuc.totalBonus > 0) {
+                document.getElementById('totalIstasyonSatir').className = 'flex justify-between';
+                document.getElementById('totalIstasyonAvantaj').textContent = `%${sonuc.totalBonus.toFixed(2)}`;
+            } else {
+                document.getElementById('totalIstasyonSatir').className = 'flex justify-between hidden';
+            }
+
+            // Açıklama
+            let aciklama = `${seciliMarka === 'shell' ? 'Shell' : 'Total'} markasında baz iskonto %${sonuc.markaIskonto.toFixed(2)}'dir. `;
+            
+            if (sonuc.totalBonus > 0) {
+                aciklama += `Total DOCO istasyon avantajı %${sonuc.totalBonus.toFixed(2)} eklenmiştir. `;
+            }
+            
+            if (sonuc.vadeFark > 0) {
+                if (seciliVade && seciliVade.startsWith('toplu')) {
+                    if (seciliMarka === 'shell') {
+                        aciklama += `Shell'e ödeme vadeniz fatura +10 gün. Müşteriye ${sonuc.ortVade} gün vade veriliyor. Toplu ödeme için %${sonuc.vadeFark.toFixed(2)} düşülmüştür. `;
+                    } else {
+                        aciklama += `Total'e ödeme vadeniz ertesi ay 10'u (ortalama 20 gün). Müşteriye ${sonuc.ortVade} gün vade veriliyor. Toplu ödeme için %${sonuc.vadeFark.toFixed(2)} düşülmüştür. `;
+                    }
+                } else {
+                    aciklama += `Müşteriye ${sonuc.ortVade} gün vade veriliyor. Standart 7 günden sonraki ${sonuc.vadeFarkGun} gün için günlük %0.14 olmak üzere toplam %${sonuc.vadeFark.toFixed(2)} düşülmüştür. `;
+                }
+            }
+            
+            if (sonuc.posKomisyon > 0) {
+                aciklama += `POS komisyonu %${sonuc.posKomisyon.toFixed(2)} düşülmüştür. `;
+            }
+            
+            if (sonuc.tersValor > 0) {
+                aciklama += `Ters valör avantajı %${sonuc.tersValor.toFixed(2)} eklenmiştir. `;
+            }
+            
+            aciklama += `Sonuç: Maksimum iskonto %${sonuc.maxIskonto.toFixed(2)}'dir.`;
+            
+            document.getElementById('aciklama').textContent = aciklama;
+            document.getElementById('sonucAlani').className = 'bg-white rounded-lg shadow-md p-6';
+        }
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'96df8aae1576e321',t:'MTc1NDk5NzE4OS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
